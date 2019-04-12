@@ -10,6 +10,8 @@
 # from ipywidgets import FloatProgress, HTML, HBox
 # from IPython.display import display
 
+# Komentarus sura6yti angliskai
+
 multiv = [
     'Interacts with',
     'Gene ontology (biological process)',
