@@ -5,7 +5,8 @@ import pandas as pd
 import os
 
 import xgboost
-
+import bioservices
+from bioservices import UniProt
 # ========================================================
 
 # =============================================================================
@@ -219,26 +220,33 @@ _valid_columns = [
     "database(EMBL)",
 ]
 
+# Not needed?
+# def parse_uniprot(entries):
+#
+#     u = UniProt(verbose=True)
+#     data = pd.DataFrame()
+#
+#     for entry in entries:
+#         clear_output(wait=True)
+#         try:
+#             ent = "id:" + entry
+#             z = u.search(
+#                 ent, frmt="tab", columns=",".join(_valid_columns), limit=1, maxTrials=3
+#             )
+#             df = pd.read_csv(io.StringIO(str(z)), sep="\t")
+#             data = pd.concat([data, df], sort=False)
+#         except:
+#             print(entry)
+#         print("Progress:", np.round(entries.index(entry) / len(entries) * 100, 2), "%")
+#     return data
 
 def parse_uniprot(entries):
-
+    ent = ['id:' + s for s in entries]
+    print(ent[2])
     u = UniProt(verbose=True)
-    data = pd.DataFrame()
+    df = u.get_df(ent)
 
-    for entry in entries:
-        clear_output(wait=True)
-        try:
-            ent = "id:" + entry
-            z = u.search(
-                ent, frmt="tab", columns=",".join(_valid_columns), limit=1, maxTrials=5
-            )
-            df = pd.read_csv(io.StringIO(str(z)), sep="\t")
-            data = pd.concat([data, df], sort=False)
-        except:
-            print(entry)
-        print("Progress:", np.round(entries.index(entry) / len(entries) * 100, 2), "%")
-    return data
-
+    return df
 
 # =============================================================================
 # Data preprocessing
@@ -284,16 +292,6 @@ stupid_list2 = [
     "Sequence similarities",
     "Chain_structure",
 ]
-
-
-def take_dataframe(path):
-    df = pd.read_excel(path, sheet_name=0)
-    return df
-
-
-def take_dataframe_blogas(path):
-    df = pd.read_csv(path, sep="\t", index_col="Entry")
-    return df
 
 def drop_cols(df):
     df = df.drop(multiv, axis=1)
@@ -352,24 +350,26 @@ def code_non_strings(df):
 
 # =============================================================================
 
+
 # MB_dataset
-# if os.path.isfile("mb_data.csv"):
-if os.path.isfile("mb_data.csv"):
-    mb_data = pd.read_csv("mb_data.csv")
-    mb_data1 = mb_data.copy()
-else:
-    # path_predict = "sil_proteom.xlsx"
-    # #     path_predict = 'MB_proteoma.xlsx'
-    #
-    # df = pd.read_excel(path_predict, sheet_name=0)
-    # #     display(df.head())
-    # entries = df.Accession.values.tolist()
-    # mb_data = parse_uniprot(entries)
-    # mb_data.to_csv("mb_data.csv")
-    print("no file - no function")
 
 
+try:
+    if os.path.isfile("mb_data.csv"): # for when internets are down
+        mb_data = pd.read_csv("mb_data.csv")
+        mb_data1 = mb_data.copy()
+    else:
+        path_predict = "sil_proteom.xlsx"
+        df = pd.read_excel(path_predict, sheet_name=0)
+        entries = df.Accession.values.tolist()
+        mb_data_temp = parse_uniprot(entries)
+        mb_data_temp.to_csv("mb_data.csv")
+        mb_data = pd.read_csv("mb_data.csv") #Shitty workaround for string problem
+        mb_data1 = mb_data.copy()
+except:
+    print('Stuff is not working. Sorry :( ')
 
+# Viską į vieną funkciją preprocess?
 mb_data = preprocess_strings(mb_data)
 mb_data = drop_cols(mb_data)
 mb_data = code_non_strings(mb_data)
@@ -381,6 +381,8 @@ X = df.values
 z = mb_data1.Entry.tolist()
 zz = mb_data1["Gene names"].tolist()
 y_pred = loaded_model.predict(X)
+
+
 
 df = pd.DataFrame({"Entry": z, "Gene name": zz, "MB": y_pred})
 
