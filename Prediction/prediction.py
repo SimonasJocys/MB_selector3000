@@ -387,4 +387,4 @@ y_pred = loaded_model.predict(X)
 df = pd.DataFrame({"Entry": z, "Gene name": zz, "MB": y_pred})
 
 
-df.to_excel("possible_MB2.xlsx")
+df.to_excel("possible_MB.xlsx")

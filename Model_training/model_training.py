@@ -14,7 +14,7 @@ import pickle
 Hela_data = pd.read_csv("Hela_data.csv")
 mb_data = pd.read_csv("mb_data.csv")
 
-
+# Ar čia tinkamas mb_data failas????
 # Preprocess and combine =======================================================
 
 # MB part
