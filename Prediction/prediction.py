@@ -353,17 +353,18 @@ def code_non_strings(df):
 
 # MB_dataset
 
-
 try:
     if os.path.isfile("mb_data.csv"): # for when internets are down
         mb_data = pd.read_csv("mb_data.csv")
         mb_data1 = mb_data.copy()
     else:
         path_predict = "sil_proteom.xlsx"
+        print('weee')
         df = pd.read_excel(path_predict, sheet_name=0)
         entries = df.Accession.values.tolist()
         mb_data_temp = parse_uniprot(entries)
         mb_data_temp.to_csv("mb_data.csv")
+        print(mb_data_temp.head())
         mb_data = pd.read_csv("mb_data.csv") #Shitty workaround for string problem
         mb_data1 = mb_data.copy()
 except:

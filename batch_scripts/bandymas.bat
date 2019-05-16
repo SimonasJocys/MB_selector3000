@@ -1,2 +1,2 @@
-"Path where your Python exe is stored\python.exe" "Path where your Python script is stored\script name.py"
+"C:\Users\simon\Anaconda3\python.exe" "C:\Users\simon\Desktop\Repositories\MB_selector3000\batch_scripts\bandymas1.py"
 pause
